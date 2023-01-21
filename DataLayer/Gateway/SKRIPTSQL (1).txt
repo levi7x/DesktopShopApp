@@ -1,0 +1,115 @@
+drop TABLE kosik go
+
+ALTER TABLE kosik DROP CONSTRAINT kosik_objednavka_fk 
+GO
+
+ALTER TABLE Platba 
+    DROP CONSTRAINT Platba_Objednavka_FK 
+GO drop TABLE objednavka go
+
+drop TABLE platba go
+
+ALTER TABLE kosik DROP CONSTRAINT kosik_product_fk 
+GO drop TABLE product go
+
+ALTER TABLE objednavka DROP CONSTRAINT objednavka_uzivatel_fk 
+GO drop TABLE uzivatel go
+
+CREATE TABLE kosik (
+    id_k           INTEGER NOT NULL IDENTITY(1,1),
+    product_id_p   INTEGER NOT NULL,
+    kusy           INTEGER NOT NULL,
+    cislo_kosika   INTEGER NOT NULL
+)
+
+go
+
+ALTER TABLE Kosik ADD constraint kosik_pk PRIMARY KEY CLUSTERED (id_k)
+     WITH (
+     ALLOW_PAGE_LOCKS = ON , 
+     ALLOW_ROW_LOCKS = ON ) go
+
+CREATE TABLE objednavka (
+    id_o               INTEGER NOT NULL,
+    uzivatel_id_u      INTEGER NOT NULL,
+    canceled           bit NOT NULL,
+    datum_objednavky   datetime NOT NULL,
+    notifikacia        VARCHAR(200)
+)
+
+go
+
+ALTER TABLE Objednavka ADD constraint objednavka_pk PRIMARY KEY CLUSTERED (id_o)
+     WITH (
+     ALLOW_PAGE_LOCKS = ON , 
+     ALLOW_ROW_LOCKS = ON ) go
+
+CREATE TABLE platba (
+    id_p              INTEGER NOT NULL,
+    objednavka_id_o   INTEGER NOT NULL,
+    cislo_karty       VARCHAR(10) NOT NULL,
+    cvc               INTEGER NOT NULL,
+    mmrrrr            VARCHAR(6) NOT NULL
+)
+
+go
+
+ALTER TABLE Platba ADD constraint platba_pk PRIMARY KEY CLUSTERED (id_p)
+     WITH (
+     ALLOW_PAGE_LOCKS = ON , 
+     ALLOW_ROW_LOCKS = ON ) go
+
+CREATE TABLE product (
+    id_p             INTEGER NOT NULL,
+    nazov_produktu   VARCHAR(20) NOT NULL,
+    pocet_kusov      INTEGER NOT NULL,
+    cena_za_kus      FLOAT NOT NULL,
+    vaha             INTEGER NOT NULL
+)
+
+go
+
+ALTER TABLE Product ADD constraint product_pk PRIMARY KEY CLUSTERED (id_p)
+     WITH (
+     ALLOW_PAGE_LOCKS = ON , 
+     ALLOW_ROW_LOCKS = ON ) go
+
+CREATE TABLE uzivatel (
+    id_u              INTEGER NOT NULL,
+    meno              VARCHAR(20) NOT NULL,
+    priezvisko        VARCHAR(30) NOT NULL,
+    email             VARCHAR(35) NOT NULL,
+    telefonne_cislo   VARCHAR(30) NOT NULL,
+    heslo             VARCHAR(15) NOT NULL
+)
+
+go
+
+ALTER TABLE Uzivatel ADD constraint user_pk PRIMARY KEY CLUSTERED (id_u)
+     WITH (
+     ALLOW_PAGE_LOCKS = ON , 
+     ALLOW_ROW_LOCKS = ON ) go
+
+ALTER TABLE Kosik
+    ADD CONSTRAINT kosik_objednavka_fk FOREIGN KEY ( cislo_kosika )
+        REFERENCES objednavka ( id_o )
+ON DELETE NO ACTION 
+    ON UPDATE no action go
+
+ALTER TABLE Kosik
+    ADD CONSTRAINT kosik_product_fk FOREIGN KEY ( product_id_p )
+        REFERENCES product ( id_p )
+ON DELETE NO ACTION 
+    ON UPDATE no action go
+
+ALTER TABLE Objednavka
+    ADD CONSTRAINT objednavka_uzivatel_fk FOREIGN KEY ( uzivatel_id_u )
+        REFERENCES uzivatel ( id_u )
+ON DELETE NO ACTION 
+    ON UPDATE no action go
+
+ALTER TABLE Platba
+    ADD CONSTRAINT platba_objednavka_fk FOREIGN KEY ( objednavka_id_o )
+        REFERENCES objednavka ( id_o )
+ON DELETE NO ACTION 
+    ON UPDATE no action go
